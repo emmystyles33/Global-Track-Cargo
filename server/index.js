@@ -17,7 +17,7 @@ console.log('SUPABASE_ANON_KEY exists:', !!process.env.SUPABASE_ANON_KEY);
 console.log('ADMIN_PASSWORD exists:', !!process.env.ADMIN_PASSWORD);
 
 const app = express();
-const PORT = process.env.API_PORT || 8787;
+const PORT = process.env.PORT || process.env.API_PORT || 8787;
 
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
