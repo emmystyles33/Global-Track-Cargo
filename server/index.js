@@ -30,6 +30,8 @@ app.use((req, res, next) => {
 app.use(cors());
 app.use(express.json());
 
+app.get('/ping', (req, res) => res.status(200).type('text/plain').send('OK'));
+
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
 // DEV ONLY: create a temporary admin session token for local testing.
