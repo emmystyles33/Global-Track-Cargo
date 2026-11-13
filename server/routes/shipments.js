@@ -271,6 +271,9 @@ router.post('/:id/hold', requireAdmin, wrapAsync(async (req, res) => {
 }));
 
 // ---------- PUBLIC: look up by tracking number (no auth) ----------
+
+
+// ---------- PUBLIC: look up by tracking number (no auth) ----------
 router.get(
   '/public/:trackingNumber',
   wrapAsync(async (req, res) => {
@@ -278,30 +281,63 @@ router.get(
 
     const { data: shipment, error } = await supabaseAdmin
       .from('shipments')
-      .select('*')
+      .select(`
+        id,
+        tracking_number,
+        origin,
+        destination,
+        origin_lat,
+        origin_lng,
+        destination_lat,
+        destination_lng,
+        shipment_type,
+        quantity,
+        estimated_delivery,
+        status,
+        is_on_hold,
+        progress_percent,
+        booked_at,
+        shipped_date
+      `)
       .eq('tracking_number', code)
       .maybeSingle();
 
     if (error) throw error;
-    if (!shipment) return res.status(404).json({ error: 'No shipment found with that tracking number' });
+    if (!shipment) {
+      return res.status(404).json({
+        error: 'No shipment found with that tracking number',
+      });
+    }
 
-    const [{ data: images }, { data: history }, { data: updates }] = await Promise.all([
-      supabaseAdmin.from('shipment_images').select('*').eq('shipment_id', shipment.id),
+    // Keep the database ID internally, but do not expose it publicly.
+    const { id: shipmentId, ...publicShipment } = shipment;
+
+    const [
+      { data: images, error: imagesError },
+      { data: updates, error: updatesError },
+    ] = await Promise.all([
       supabaseAdmin
-        .from('shipment_status_history')
-        .select('*')
-        .eq('shipment_id', shipment.id)
-        .order('changed_at', { ascending: true }),
+        .from('shipment_images')
+        .select('url')
+        .eq('shipment_id', shipmentId),
       supabaseAdmin
         .from('shipment_updates')
-        .select('*')
-        .eq('shipment_id', shipment.id)
+        .select('id, message, update_time')
+        .eq('shipment_id', shipmentId)
         .order('update_time', { ascending: true }),
     ]);
 
-    res.json({ shipment, images: images || [], history: history || [], updates: updates || [] });
+    if (imagesError) throw imagesError;
+    if (updatesError) throw updatesError;
+
+    res.json({
+      shipment: publicShipment,
+      images: images || [],
+      updates: updates || [],
+    });
   })
 );
+
 
 // ---------- ADMIN: shipment updates ----------
 router.post('/:id/updates', requireAdmin, wrapAsync(async (req, res) => {

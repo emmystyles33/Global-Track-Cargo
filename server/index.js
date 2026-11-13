@@ -32,47 +32,6 @@ app.use(express.json());
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
-app.get('/api/debug/env', (req, res) => {
-  const rawUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || null;
-  let parsedHost = null;
-  try {
-    parsedHost = rawUrl ? new URL(rawUrl).hostname : null;
-  } catch (err) {
-    parsedHost = `invalid url (${err.message})`;
-  }
-
-  res.json({
-    nodeEnv: process.env.NODE_ENV || null,
-    supabaseUrlDefined: !!rawUrl,
-    supabaseHost: parsedHost,
-    supabaseServiceRoleDefined: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE),
-    adminPasswordDefined: !!process.env.ADMIN_PASSWORD,
-  });
-});
-
-app.get('/api/test-supabase', async (req, res) => {
-  try {
-    const { data, error } = await import('./supabaseAdmin.js').then((m) => m.supabaseAdmin)
-      .then((supabaseAdmin) => supabaseAdmin.from('shipments').select('*').limit(1));
-
-    res.json({
-      success: true,
-      data,
-    });
-  } catch (err) {
-    console.error('TEST SUPABASE ERROR', err);
-    const response = {
-      success: false,
-      error: err.message,
-    };
-    if (process.env.NODE_ENV !== 'production') {
-      response.details = err.details || err.hint || '';
-      response.stack = err.stack;
-    }
-    res.status(500).json(response);
-  }
-});
-
 // DEV ONLY: create a temporary admin session token for local testing.
 // This endpoint is intentionally available only when not in production.
 if (process.env.NODE_ENV !== 'production') {
