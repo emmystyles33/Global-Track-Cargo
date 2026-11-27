@@ -337,7 +337,7 @@ export default function TrackResult() {
           </div>
           <div>
             <strong>Support</strong>
-            <a href="mailto:support@globaltrackcargo.com">support@globaltrackcargo.com</a>
+            <a href="mailto:globaltrackcargointernational@gmail.com">globaltrackcargointernational@gmail.com</a>
             <a href="tel:+442079460958">+44 20 7946 0958</a>
           </div>
         </div>

@@ -362,8 +362,7 @@ export default function TrackHome() {
             </div>
             <div>
               <p className="footer-title">Support</p>
-              <a href="tel:+18001234567">+1 800 123 4567</a>
-              <a href="mailto:contact@globaltrackcargo.com">contact@globaltrackcargo.com</a>
+              <a href="mailto:globaltrackcargointernational@gmail.com">globaltrackcargointernational@gmail.com</a>
               <a href="#contact">123 Logistics Ave, London</a>
             </div>
             <div>
